@@ -1,0 +1,42 @@
+---
+  - name: Ansible openstack
+    hosts: localhost
+    tasks:
+      - name: create a key
+        os_keypair:
+         name: key
+         auth: 
+           auth_url: http://172.16.5.208/identity/v3 
+           username: admin
+           password: secret
+           project_name: test
+         state: present
+
+      - name: Upload the local image to glance
+        os_image:
+          auth:
+            auth_url: http://172.16.5.208/identity/v3
+            username: admin
+            password: secret
+            project_name: test
+          name: ubuntu
+          container_format: bare
+          disk_format: qcow2	
+          state: present
+          filename: /home/labredes-13/Descargas/xenial-server-cloudimg-amd64-disk1.img
+          is_public: yes
+
+      - name: create an instance
+        os_server:
+          auth:
+            auth_url: http://172.16.5.208/identity/v3
+            username: admin
+            password: secret
+            project_name: test
+          name: ubuntu
+          image: ubuntu
+          timeout: 300
+          flavor: 2
+          state: present
+          key_name: key
+          auto_ip: yes
